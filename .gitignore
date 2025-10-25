@@ -1,0 +1,85 @@
+# ========================
+# .NET / C# + SQLite
+# ========================
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+
+# Visual Studio files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.ide
+.vs/
+.vscode/
+
+# JetBrains Rider
+.idea/
+
+# Test results
+TestResult*/
+TestResults/
+
+# Package management
+packages/
+*.nupkg
+*.snupkg
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+
+# DotNet local tools
+.dotnet/
+.tools/
+
+# SQLite database files (generated during runtime)
+*.db
+*.db3
+*.sqlite
+*.sqlite3
+
+# Backup / temporary files
+*.bak
+*.tmp
+*.temp
+*.log
+*.cache
+*.swp
+*.DS_Store
+Thumbs.db
+
+# User secrets (if using ASP.NET Core)
+secrets.json
+
+# Publish output
+publish/
+dist/
+artifacts/
+
+# Configuration overrides
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Resharper / Analyzers
+_ReSharper*/
+*.DotSettings.user
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Windows specific
+ehthumbs.db
+Desktop.ini
+
+# MacOS specific
+.DS_Store
+
+# ========================
+# END
+# ========================
