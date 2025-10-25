@@ -6,15 +6,29 @@ using System.Threading.Tasks;
 
 namespace DtiAnimeManager.Models
 {
-    internal class Anime
+    public class Anime
     {
         #region Variaveis
         public int Id { get; set; }
         public string Nome { get; set; }
         public string Autor { get; set; }
+        public string Estudio { get; set; }
         public string Genero { get; set; }
-        public string DataDeLancamento { get; set; }
+        public DateTime DataDeLancamento { get; set; }
         public double? Nota { get; set; }
+        #endregion
+
+        #region construtor
+        public Anime(int id, string nome, string autor, string estudio, string genero,DateTime data, double? nota)
+        {
+            this.Id = id;
+            this.Nome = nome;
+            this.Autor = autor;
+            this.Estudio = estudio;
+            this.Genero = genero;
+            this.DataDeLancamento = data;
+            this.Nota = nota;
+        }
         #endregion
 
         #region Herança
@@ -28,6 +42,8 @@ namespace DtiAnimeManager.Models
             sb.AppendLine($"\t{Nome}");
             sb.AppendLine($"Autor:");
             sb.AppendLine($"\t{Autor}");
+            sb.AppendLine($"Estudio:");
+            sb.AppendLine($"\t{Estudio}");
             sb.AppendLine($"Genero:");
             sb.AppendLine($"\t{Genero}");
             sb.AppendLine($"Data De Lancamento:");
