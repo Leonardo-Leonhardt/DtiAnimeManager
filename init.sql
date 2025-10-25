@@ -1,10 +1,10 @@
-CREATE TABLE "Anime" (
+CREATE TABLE IF NOT EXISTS "Anime" (
 	"ID"	INTEGER,
 	"Name"	TEXT NOT NULL,
 	"Autor"	TEXT NOT NULL,
 	"Estudio"	TEXT NOT NULL,
 	"Genero"	TEXT NOT NULL,
-	"Data"	TEXT NOT NULL,
+	"DataDeLancamento"	TEXT NOT NULL,
 	"Nota"	REAL,
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
