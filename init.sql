@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS Animes (
 	"Autor"	TEXT NOT NULL,
 	"Estudio"	TEXT NOT NULL,
 	"Genero"	TEXT NOT NULL,
-	"DataDeLancamento"	TEXT NOT NULL,
+	"Data"	TEXT NOT NULL,
 	"Nota"	REAL,
 );
 
