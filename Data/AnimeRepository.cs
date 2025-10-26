@@ -48,14 +48,14 @@ namespace DtiAnimeManager.Models
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT INTO Animes(Nome, Autor, Estudio, Genero, DataDeLancamento, Nota) VALUES ($Nome, $Autor, $Estudio, $Genero, $Data, $Nota)";
+                    command.CommandText = "INSERT INTO Animes(Name, Autor, Estudio, Genero, DataDeLancamento, Nota) VALUES ($Name, $Autor, $Estudio, $Genero, $DataDeLancamento, $Nota)";
 
-                    command.Parameters.AddWithValue("$Nome", anime.Nome);
+                    command.Parameters.AddWithValue("$Name", anime.Nome);
                     command.Parameters.AddWithValue("$Autor", anime.Autor);
                     command.Parameters.AddWithValue("$Estudio", anime.Estudio);
                     command.Parameters.AddWithValue("$Genero", anime.Genero);
                     command.Parameters.AddWithValue("$DataDeLancamento", anime.DataDeLancamento.ToString("yyyy-MM-dd HH:mm:ss"));
-                    command.Parameters.AddWithValue("$Nota", anime.Nota ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("$Nota", (object)anime.Nota ?? DBNull.Value);
 
                     command.ExecuteNonQuery();
                 }
@@ -84,9 +84,11 @@ namespace DtiAnimeManager.Models
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "UPDATE Animes SET Nome = $Nome, Autor = $Autor, Estudio = $Estudio, Genero = $Genero, DataDeLancamento = $Data, Nota = $Nota WHERE ID = $Id";
+                    command.CommandText = "UPDATE Animes SET Name = $Name, Autor = $Autor, Estudio = $Estudio, Genero = $Genero, DataDeLancamento = $DataDeLancamento, Nota = $Nota WHERE ID = $Id";
 
-                    command.Parameters.AddWithValue("$Nome", anime.Nome);
+                    command.Parameters.AddWithValue("$Id", id);
+
+                    command.Parameters.AddWithValue("$Name", anime.Nome);
                     command.Parameters.AddWithValue("$Autor", anime.Autor);
                     command.Parameters.AddWithValue("$Estudio", anime.Estudio);
                     command.Parameters.AddWithValue("$Genero", anime.Genero);
@@ -117,7 +119,7 @@ namespace DtiAnimeManager.Models
                     {
                         while (reader.Read())
                         {
-                            var anime = new Anime(reader.GetInt32(0), reader.GetString(2), reader.GetString(3), reader.GetString(4), reader.GetString(5), reader.GetDateTime(6), reader.IsDBNull(7) ? null : reader.GetDouble(7));
+                            var anime = new Anime(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), DateTime.Parse(reader.GetString(5)), reader.IsDBNull(6) ? null : reader.GetDouble(6));
 
                             animes.Add(anime);
                         }
@@ -139,13 +141,13 @@ namespace DtiAnimeManager.Models
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @$"SELECT ID FROM Animes WHERE Id = {id}";
+                    command.CommandText = @$"SELECT * FROM Animes WHERE Id = {id}";
 
                     using (var reader = command.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            var anime = new Anime(reader.GetInt32(0), reader.GetString(2), reader.GetString(3), reader.GetString(4), reader.GetString(5), reader.GetDateTime(6), reader.IsDBNull(7) ? null : reader.GetDouble(7));
+                            var anime = new Anime(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), DateTime.Parse(reader.GetString(5)), reader.IsDBNull(6) ? null : reader.GetDouble(6));
 
                             return anime;
                         }
@@ -178,6 +180,25 @@ namespace DtiAnimeManager.Models
             }
         }
 
+        public static bool DeletarTudo()
+        {
+            string connectionString = "Data Source=biblioteca.db";
+
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "DROP TABLE IF EXISTS Animes;";
+
+                    command.ExecuteNonQuery();
+
+                    return true;
+                }
+            }
+        }
+
         #region Private
         private static bool ValidarEntrada(Anime anime)
         {
@@ -191,16 +212,16 @@ namespace DtiAnimeManager.Models
 
         private static string LerSql()
         {
-            string nomeArquivo = "init.sql";
+            string NameArquivo = "init.sql";
             string scriptSql = string.Empty;
 
             try
             {
-                scriptSql = File.ReadAllText(nomeArquivo);
+                scriptSql = File.ReadAllText(NameArquivo);
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine($"Erro: O arquivo '{nomeArquivo}' não foi encontrado no diretório de execução.");
+                Console.WriteLine($"Erro: O arquivo '{NameArquivo}' não foi encontrado no diretório de execução.");
                 throw;
             }
             catch (SqliteException ex)
