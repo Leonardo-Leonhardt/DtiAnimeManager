@@ -69,6 +69,11 @@ namespace DtiAnimeManager
                         DeletarTudo();
                         MensagemDeTecleEnter();
                         break;
+                    case 9:
+                        Cabecalho();
+                        DeletarTabelaAnime();
+                        MensagemDeTecleEnter();
+                        break;
                     case 0:
                         Cabecalho();
                         Console.WriteLine("Saindo...");
@@ -99,6 +104,7 @@ namespace DtiAnimeManager
             Console.WriteLine($"6 - Lista um anime expesifico.");
             Console.WriteLine($"7 - Deletar um anime.");
             Console.WriteLine($"8 - Deletar tudo.");
+            Console.WriteLine($"9 - Deletar a tabela.");
             Console.WriteLine($"0 - Sair.\n");
         }
 
@@ -123,24 +129,16 @@ namespace DtiAnimeManager
         /// Tenta cadastrar um novo anime no repositório com base na entrada do usuário.
         /// </summary>
         /// <remarks>
-        /// Este método chama <see cref="CriarAnime"/> para coletar os detalhes do anime.
-        /// Em seguida, tenta passar o objeto anime para o <c>AnimeRepository.CadastrarAnime</c>.
-        /// Ele verifica o valor de retorno booleano do repositório e exibe uma mensagem
-        /// de sucesso ou de falha apropriada no console.
+        /// Este método primeiro chama <see cref="CriarAnime"/> para coletar os detalhes do anime.
+        /// Em seguida, ele passa o objeto anime para o método <c>AnimeRepository.CadastrarAnime</c>.
+        /// O valor de retorno (uma <see cref="string"/> com a mensagem de status, seja de sucesso ou erro)
+        /// é então impresso diretamente no console.
         /// </remarks>
         static void CadastraAnime()
         {
             Anime anime = CriarAnime();
 
-            if (!AnimeRepository.CadastrarAnime(anime))
-            {
-                Console.WriteLine("\nNão foi possível cadastrar o anime. Verifique os dados e tente novamente.");
-            }
-            else
-            {
-                Console.WriteLine("\nAnime cadastrado com sucesso!");
-
-            }
+            Console.WriteLine($"\n{AnimeRepository.CadastrarAnime(anime)}");
         }
 
         /// <summary>
@@ -152,7 +150,6 @@ namespace DtiAnimeManager
         /// </remarks>
         static void PopularBancoComDadosTeste()
         {
-            int contador = 0;
             Console.WriteLine("Iniciando carga de dados de teste...");
 
             Anime[] animes = new Anime[] {
@@ -169,10 +166,7 @@ namespace DtiAnimeManager
 
             foreach (var anime in animes)
             {
-                if (!AnimeRepository.CadastrarAnime(anime))
-                {
-                    Console.WriteLine($"\nNão foi possível cadastrar o anime: {anime.Nome}. Verifique os dados e tente novamente.");
-                }
+                Console.WriteLine($"\n{AnimeRepository.CadastrarAnime(anime)}");
             }
         }
 
@@ -299,6 +293,49 @@ namespace DtiAnimeManager
                     Console.WriteLine("\nTodos os animes foram deletados.");
                 }
 
+            }
+        }
+
+        /// <summary>
+        /// Exclui permanentemente o banco de dados após uma confirmação de segurança rigorosa.
+        /// </summary>
+        /// <remarks>
+        /// O método solicita uma confirmação de duas etapas para evitar a exclusão acidental.
+        /// Primeiro, pede uma confirmação simples (via <c>ComfirmarAcao</c>). Se o usuário confirmar,
+        /// o método exige uma segunda confirmação, onde o usuário deve digitar a frase
+        /// exata "DELETAR BANCO DE DADOS". A exclusão só é executada se ambas as etapas
+        /// forem concluídas com sucesso.
+        /// </remarks>
+        static void DeletarTabelaAnime()
+        {
+            if (!ComfirmarAcao("Tem certesa que deseja deleta o banco de dados?"))
+            {
+                Console.WriteLine("\nO banco de dados não foi deletado.");
+            }
+            else
+            {
+                Console.WriteLine($"Para confirmar que deseja deletar digite a seguinte frase:");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\nDELETAR TABELA DE ANIMES");
+                Console.ResetColor();
+                string fraseConfirmacao = Convert.ToString(Console.ReadLine());
+                string fraseCorreta = "DELETAR TABELA DE ANIMES";
+
+                if (fraseConfirmacao != fraseCorreta)
+                {
+                    Console.WriteLine("\nFrase incorreta. A tabela de animes não foi deletado.");
+                }
+                else
+                {
+                    if (!AnimeRepository.DeletarTabelaAnimes())
+                    {
+                        Console.WriteLine("\nErro ao deletar a tabela de animes.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nA tabela de animes foi deletado com sucesso.");
+                    }
+                }
             }
         }
 

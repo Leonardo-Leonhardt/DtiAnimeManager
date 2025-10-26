@@ -44,48 +44,36 @@ namespace DtiAnimeManager.Models
         /// </summary>
         /// <remarks>
         /// Este método primeiro verifica se o objeto anime é nulo ou inválido (usando <see cref="ValidarEntrada"/>).
-        /// Em seguida, ele abre uma conexão, adiciona os parâmetros do objeto anime (prevenindo SQL Injection)
+        /// Em seguida, ele abre uma conexão, adiciona os parâmetros do objeto anime
         /// e executa um comando INSERT. Ele trata a 'Nota' nula convertendo-a para DBNull.Value.
         /// </remarks>
         /// <param name="anime">O objeto <see cref="Anime"/> contendo os dados a serem inseridos.</param>
         /// <returns>
-        /// <see langword="true"/> se o anime foi inserido com sucesso;
-        /// caso contrário, <see langword="false"/>.
+        /// Uma <see cref="string"/> indicando o resultado da operação:
+        /// - "Anime cadastrado com sucesso!" (em caso de sucesso).
+        /// - Uma mensagem de erro específica (em caso de dados nulos, inválidos ou erro no banco).
         /// </returns>
-        public static bool CadastrarAnime(Anime anime)
+        public static string CadastrarAnime(Anime anime)
         {
             string connectionString = "Data Source=biblioteca.db";
 
             if (anime == null)
             {
-                return false;
+                return "Erro: Os dados do anime estão nulos.";
             }
 
             if (!ValidarEntrada(anime))
             {
-                return false;
+                return "Erro: Dados inválidos. Por favor, verifique os campos.";
             }
 
             using (var connection = new SqliteConnection(connectionString))
             {
-
                 connection.Open();
 
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = "INSERT INTO Animes(Name, Autor, Estudio, Genero, DataDeLancamento, Nota) VALUES ($Name, $Autor, $Estudio, $Genero, $DataDeLancamento, $Nota)";
-
-                    try
-                    {
-                        if (command.ExecuteScalar() == null)
-                        {
-                            return false;
-                        }
-                    }
-                    catch (SqliteException)
-                    {
-                        return false;
-                    }
 
                     command.Parameters.AddWithValue("$Name", anime.Nome);
                     command.Parameters.AddWithValue("$Autor", anime.Autor);
@@ -94,11 +82,25 @@ namespace DtiAnimeManager.Models
                     command.Parameters.AddWithValue("$DataDeLancamento", anime.DataDeLancamento.ToString("yyyy-MM-dd HH:mm:ss"));
                     command.Parameters.AddWithValue("$Nota", (object)anime.Nota ?? DBNull.Value);
 
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        int linhasAfetadas = command.ExecuteNonQuery();
+
+                        if (linhasAfetadas > 0)
+                        {
+                            return "Anime cadastrado com sucesso!";
+                        }
+                        else
+                        {
+                            return "Aviso: O comando foi executado, mas nenhuma linha foi alterada.";
+                        }
+                    }
+                    catch (SqliteException ex)
+                    {
+                        return $"Erro de banco de dados: {ex.Message}";
+                    }
                 }
             }
-
-            return true;
         }
 
         /// <summary>
@@ -318,6 +320,41 @@ namespace DtiAnimeManager.Models
                     command.CommandText = "DELETE FROM Animes;";
 
                     if (command.ExecuteNonQuery() >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Exclui a tabela "Animes" do banco de dados "biblioteca.db".
+        /// </summary>
+        /// <returns>
+        /// Retorna <c>true</c> se a tabela for excluída com sucesso (ou se ela já não existia, 
+        /// pois o comando usa "IF EXISTS"). Retorna <c>false</c> se ocorrer uma exceção 
+        /// durante a execução do comando.
+        /// </returns>
+        /// <remarks>
+        /// Este método executa o comando SQL "DROP TABLE IF EXISTS Animes;".
+        /// </remarks>
+        public static bool DeletarTabelaAnimes()
+        {
+            string connectionString = "Data Source=biblioteca.db";
+
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "DROP TABLE IF EXISTS Animes;";
+
+                    if (command.ExecuteNonQuery() != -1 || command.ExecuteNonQuery() != 0)
                     {
                         return true;
                     }
