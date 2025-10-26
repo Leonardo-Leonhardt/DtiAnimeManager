@@ -48,6 +48,11 @@ namespace DtiAnimeManager.Models
 
                 using (var command = connection.CreateCommand())
                 {
+                    //if (command.ExecuteScalar() == null)
+                    //{
+                    //    return false;
+                    //}
+
                     command.CommandText = "INSERT INTO Animes(Name, Autor, Estudio, Genero, DataDeLancamento, Nota) VALUES ($Name, $Autor, $Estudio, $Genero, $DataDeLancamento, $Nota)";
 
                     command.Parameters.AddWithValue("$Name", anime.Nome);
@@ -63,7 +68,7 @@ namespace DtiAnimeManager.Models
 
             return true;
         }
-       
+
         public static bool AtualizarAnime(int id, Anime anime)
         {
             if (anime == null)
@@ -95,14 +100,17 @@ namespace DtiAnimeManager.Models
                     command.Parameters.AddWithValue("$DataDeLancamento", anime.DataDeLancamento.ToString("yyyy-MM-dd HH:mm:ss"));
                     command.Parameters.AddWithValue("$Nota", anime.Nota ?? (object)DBNull.Value);
 
-                    command.ExecuteNonQuery();
+                    if (command.ExecuteNonQuery() != 1)
+                    {
+                        return false;
+                    }
                 }
             }
 
             return true;
         }
 
-        public static List<Anime> ListarAnimes()
+        public static List<Anime>? ListarAnimes()
         {
             List<Anime> animes = new List<Anime>();
             string connectionString = "Data Source=biblioteca.db";
@@ -113,25 +121,36 @@ namespace DtiAnimeManager.Models
 
                 using (var command = connection.CreateCommand())
                 {
+
+
                     command.CommandText = $"SELECT * FROM Animes";
+
+                    try
+                    {
+                        if (command.ExecuteScalar() == null)
+                        {
+                            return null;
+                        }
+                    }
+                    catch (SqliteException)
+                    {
+                        return null;
+                    }
 
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            var anime = new Anime(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), DateTime.Parse(reader.GetString(5)), reader.IsDBNull(6) ? null : reader.GetDouble(6));
-
-                            animes.Add(anime);
+                            animes.Add(CriarAnime(reader));
                         }
                     }
                 }
             }
 
             return animes;
-
         }
 
-        public static Anime ListarAnime(int id)
+        public static Anime? ListarAnime(int id)
         {
             string connectionString = "Data Source=biblioteca.db";
 
@@ -147,9 +166,7 @@ namespace DtiAnimeManager.Models
                     {
                         if (reader.Read())
                         {
-                            var anime = new Anime(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), DateTime.Parse(reader.GetString(5)), reader.IsDBNull(6) ? null : reader.GetDouble(6));
-
-                            return anime;
+                            return CriarAnime(reader);
                         }
 
                         return null;
@@ -173,9 +190,14 @@ namespace DtiAnimeManager.Models
 
                     command.Parameters.AddWithValue("$id", id);
 
-                    command.ExecuteNonQuery();
-
-                    return true;
+                    if (command.ExecuteNonQuery() == 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -192,9 +214,14 @@ namespace DtiAnimeManager.Models
                 {
                     command.CommandText = "DROP TABLE IF EXISTS Animes;";
 
-                    command.ExecuteNonQuery();
-
-                    return true;
+                    if (command.ExecuteNonQuery() >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -235,6 +262,11 @@ namespace DtiAnimeManager.Models
             }
 
             return scriptSql;
+        }
+
+        private static Anime CriarAnime(SqliteDataReader reader)
+        {
+            return new Anime(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), DateTime.Parse(reader.GetString(5)), reader.IsDBNull(6) ? null : reader.GetDouble(6));
         }
         #endregion
     }
