@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS Animes (
 	"Estudio"	TEXT NOT NULL,
 	"Genero"	TEXT NOT NULL,
 	"Data"	TEXT NOT NULL,
-	"Nota"	REAL,
+	"Nota"	REAL
 );
 

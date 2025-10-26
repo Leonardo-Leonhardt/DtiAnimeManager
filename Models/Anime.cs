@@ -29,6 +29,16 @@ namespace DtiAnimeManager.Models
             this.DataDeLancamento = data;
             this.Nota = nota;
         }
+
+        public Anime(string nome, string autor, string estudio, string genero, DateTime data, double? nota)
+        {
+            this.Nome = nome;
+            this.Autor = autor;
+            this.Estudio = estudio;
+            this.Genero = genero;
+            this.DataDeLancamento = data;
+            this.Nota = nota;
+        }
         #endregion
 
         #region Herança
