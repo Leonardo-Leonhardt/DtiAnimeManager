@@ -101,6 +101,21 @@ namespace DtiAnimeManager.Models
             return true;
         }
 
+        /// <summary>
+        /// Tenta atualizar um anime existente no banco de dados SQLite com base em seu ID.
+        /// </summary>
+        /// <remarks>
+        /// Este método primeiro verifica se o objeto <paramref name="anime"/> é nulo ou inválido (usando <see cref="ValidarEntrada"/>).
+        /// Em seguida, ele abre uma conexão e executa um comando SQL UPDATE para o <paramref name="id"/> fornecido.
+        /// O método utiliza parâmetros para prevenir SQL Injection e trata corretamente a 'Nota' nula, convertendo-a para DBNull.Value.
+        /// A data é formatada como "yyyy-MM-dd HH:mm:ss".
+        /// </remarks>
+        /// <param name="id">O ID do anime a ser atualizado no banco de dados.</param>
+        /// <param name="anime">O objeto <see cref="Anime"/> contendo os novos dados para o registro.</param>
+        /// <returns>
+        /// <see langword="true"/> se exatamente um registro foi atualizado com sucesso;
+        /// caso contrário, <see langword="false"/>.
+        /// </returns>
         public static bool AtualizarAnime(int id, Anime anime)
         {
             if (anime == null)
